@@ -49,7 +49,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     peers.addAll(refreshedPeers);
 
                     System.out.println("Peers.size: " + peers.size());
-/*
+
                     if (peers.size() == 1) {
                         WifiP2pDevice device = peers.get(0);
                         WifiP2pConfig config = new WifiP2pConfig();
@@ -71,7 +71,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                     }
 
-*/
+
                 }
 
                 if (peers.size() == 0) {
