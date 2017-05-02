@@ -20,7 +20,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private MainActivity mActivity;
-    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    public List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    public List<WifiP2pDevice> refreshedPeers;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel,
                                        MainActivity activity) {
@@ -28,7 +29,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         this.mManager = manager;
         this.mChannel = channel;
         this.mActivity = activity;
+
     }
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -38,12 +41,22 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             @Override
             public void onPeersAvailable(WifiP2pDeviceList peerList) {
 
-
                 System.out.println("Test3: " + peerList.getDeviceList().toString());
 
+                refreshedPeers = new ArrayList(peerList.getDeviceList());
+                mActivity.testlist.clear();
+                for(int i = 0; i < refreshedPeers.size(); i++) {
+                    mActivity.testlist.add(i, refreshedPeers.get(i).deviceName);
+                }
+
+                mActivity.adapter.notifyDataSetChanged();
 
 
-                List<WifiP2pDevice> refreshedPeers = new ArrayList(peerList.getDeviceList());
+
+                //---------------------------
+
+                /*
+
                 if (!refreshedPeers.equals(peers)) {
                     peers.clear();
                     peers.addAll(refreshedPeers);
@@ -68,20 +81,26 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                 //failure logic
                             }
                         });
-
                     }
-
-
                 }
 
                 if (peers.size() == 0) {
                     System.out.println("No devices found");
                     return;
                 }
+
+
+
+
+
+                */
+
+                //----------------------------
+
+
+
             }
         };
-
-
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
@@ -104,4 +123,30 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // Respond to this device's wifi state changing
         }
     }
+
+
+    public void connect(int device_number){
+
+        WifiP2pDevice device = refreshedPeers.get(device_number);
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                System.out.println("Test2: Successful bound");
+                //Hier kommt am Tablet die aufforderung die verbindung manuell zu bestätigen
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                System.out.println("Test2: Failure bound");
+                //failure logic
+            }
+        });
+
+    }
+
+
+
 }
